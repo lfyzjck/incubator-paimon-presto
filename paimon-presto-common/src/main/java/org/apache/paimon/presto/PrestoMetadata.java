@@ -47,6 +47,9 @@ import com.facebook.presto.spi.SchemaTablePrefix;
 import com.facebook.presto.spi.connector.ConnectorMetadata;
 import com.facebook.presto.spi.connector.ConnectorOutputMetadata;
 import com.facebook.presto.spi.statistics.ComputedStatistics;
+import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableMap;
+
 import io.airlift.slice.Slice;
 
 import java.io.IOException;
@@ -150,6 +153,9 @@ public class PrestoMetadata implements ConnectorMetadata {
             ConnectorTableHandle table,
             Constraint<ColumnHandle> constraint,
             Optional<Set<ColumnHandle>> desiredColumns) {
+        Map<String, ColumnHandle> predicateColumns = constraint.getSummary().getDomains().get().keySet().stream()
+            .map(PrestoColumnHandle.class::cast)
+            .collect(ImmutableMap.toImmutableMap(PrestoColumnHandle::getColumnName, Functions.identity()));
         PrestoTableHandle handle = (PrestoTableHandle) table;
         ConnectorTableLayout layout =
                 new ConnectorTableLayout(

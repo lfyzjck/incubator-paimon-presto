@@ -26,6 +26,8 @@ import com.facebook.presto.spi.ConnectorTableLayoutHandle;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /** Presto {@link ConnectorTableLayoutHandle}. */
@@ -33,14 +35,28 @@ public class PrestoTableLayoutHandle implements ConnectorTableLayoutHandle {
 
     private final PrestoTableHandle tableHandle;
     private final TupleDomain<ColumnHandle> constraintSummary;
+    private final Map<String, PrestoColumnHandle> predicateColumns;
+    private final List<PrestoColumnHandle> partitionColumns;
 
-    @JsonCreator
+	@JsonCreator
     public PrestoTableLayoutHandle(
             @JsonProperty("tableHandle") PrestoTableHandle tableHandle,
-            @JsonProperty("constraintSummary") TupleDomain<ColumnHandle> constraintSummary) {
+            @JsonProperty("constraintSummary") TupleDomain<ColumnHandle> constraintSummary,
+            @JsonProperty("predicateColumns") Map<String, PrestoColumnHandle> predicateColumns,
+            @JsonProperty("partitionColumns") List<PrestoColumnHandle> partitionColumns) {
         this.tableHandle = Objects.requireNonNull(tableHandle, "table is null");
         this.constraintSummary = constraintSummary;
+        this.predicateColumns = predicateColumns;
+        this.partitionColumns = partitionColumns;
     }
+
+    public Map<String, PrestoColumnHandle> getPredicateColumns() {
+		return predicateColumns;
+	}
+
+	public List<PrestoColumnHandle> getPartitionColumns() {
+		return partitionColumns;
+	}
 
     @JsonProperty
     public PrestoTableHandle getTableHandle() {
